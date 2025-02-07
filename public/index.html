@@ -1,0 +1,260 @@
+<html>
+    <head>
+        <title>Assignment 2</title>
+        <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+
+        <script src="https://unpkg.com/aframe-environment-component@1.3.3/dist/aframe-environment-component.min.js"></script>
+        <script src="https://unpkg.com/aframe-physics-system@5.0.0/dist/aframe-physics-system.min.js"></script>
+
+        <script src="js/molten.js"></script>
+        <script src="js/pickup.js"></script>
+        <script src="js/forge-logic.js"></script>
+
+        <link rel="stylesheet" href="css/user-gesture.css">
+    </head>
+    <body>
+        <a-scene start-experience>
+
+            <!-- this is where we load all assets such as images, sound, video, models etc. -->
+            <a-assets>
+                <a-asset-item id="first_sword_model" src="assets/models/First_Sword/old_viking_sword.glb" response-type="arraybuffer"></a-asset-item>
+                <a-asset-item id="iron" src="assets/models/Iron_Ingot/metal_ingot.glb" response-type="arraybuffer"></a-asset-item>
+                <audio id="pickupSound" src="assets/sounds/coin-collect-retro-8-bit-sound-effect-145251.mp3"></audio>
+            </a-assets>
+
+            <!-- define our camera -->
+             <a-entity id="mainCam" camera wasd-controls="acceleration: 20" look-controls position="0 1.6 0" dynamic-body>
+                <!-- castShadows only works on geometry that receives shadows using the 'shadow' component -->
+                <a-entity cursor="rayOrigin:mouse;" 
+                          raycaster="far:5; interval:200; objects:.interactive">
+                </a-entity>
+             </a-entity>
+
+             <!-- some bg vibes -->
+
+
+            <!--Blacksmith Stuff-->
+            <a-entity id="work_area">
+                <!-- Left counter: Molten Metal-->
+                 <a-entity id="counter_left" position="-5 0 0" rotation="0 90 0">
+                    <!--Wood base-->
+                    <a-entity
+                        geometry="primitive:box; width:2; height:0.75; depth:1;"
+                        material="color:#4B3621; metalness:0.1; roughness:0.9;"
+                        position="0 0.3 0">
+                    </a-entity>
+                    <!-- Molten Metal Surface 
+                     <a-entity 
+                     id ="moltenSurface"
+                     geometry="primitive:box; width:1.9; height:0.1; depth:0.9;"
+                     material="color:#ff4500; emissive:#ff4500; emissiveIntensity:1.5;"
+                     position="0 0.65 0"> -->
+                     </a-entity>
+                </a-entity>
+                <!-- Open Counter: right-->
+                <a-entity id="counter_right"
+                        geometry="primitive:box; width:2.5; height:0.75; depth:1;"
+                        material="color:#8B4513;"
+                        position="5 0.3 0"
+                        rotation="0 -90 0"
+                        shadow="cast:true; receive:true">
+                </a-entity>
+                <!-- Anvil -->
+                <a-entity id="anvil" position="0 0 -5">
+                    <a-entity geometry="primitive:box; width:2; height:0.8; depth:1.5;"
+                              material="color:#666; metalness:0.8; roughness:0.3;"
+                              position="0 0.5 0"
+                              shadow="cast:true; receive:true">
+                    </a-entity>
+                    <a-entity geometry="primitive:box; width:1.8; height:0.3; depth:1.3;"
+                              material="color:#555; metalness:0.9; roughness:0.2;"
+                              position="0 0.9 0"
+                              shadow="cast:true; receive:true">
+                    </a-entity>
+                </a-entity>
+
+                <!-- Forge -->
+                 <a-entity id="forge" position="-7.55 0 -7.546" rotation="0 45 0" interactive>
+                    <!-- Forge Base-->
+                    <a-entity geometry="primitive:box; width:3; height:2; depth:2;"
+                              material="color:#551A1A"
+                              position="0 1 0">
+                    </a-entity>
+                    <!-- Glowing Fire-->
+                    <a-entity geometry="primitive:sphere; radius:0.8;"
+                              material="color:#ff4500; emissive:#ff4500; emissiveIntensity:2"
+                              position="0 1 0.45"
+                              animation__glow="property: material.emissiveIntensity; from 1.5; to: 5.5; dur: 1000; dir: alternate; loop: true">
+                    </a-entity>
+                    <!-- Light from the fire -->
+                    <a-entity light="type:point; intensity:2.0; distance:10; color:#ff4500"
+                              position="0 1.5 0">
+                    </a-entity>
+                    <!--Forge pad for interactivity-->
+                    <a-entity geometry="primitive:box; width:2; height:0.1; depth:1;"
+                              material="color:551A1A"
+                              position="0 0 1.5"
+                              id="forgePad"
+                              class="interactive"
+                              forge-pad-trigger>
+                    </a-entity>
+                 </a-entity>
+
+                <!-- Grinder -->
+                 <a-entity id="grinder" position="4 0 -5">
+                    <!-- Base -->
+                     <a-entity geometry="primitive:box; width:2; height:0.8; depth:1"
+                               material="color:#444;"
+                               position="0 0.6 0">
+                     </a-entity>
+
+                     <!--Support Legs-->
+                     <a-entity geometry="primitive:box; width:0.2 height:0.1; depth:0.2;" material="color:#666;" position="-0.8 0 -0.3"></a-entity>
+                     <a-entity geometry="primitive:box; width:0.2 height:0.2; depth:0.2;" material="color:#666;" position="0.8 0 -0.3"></a-entity>
+                     <a-entity geometry="primitive:box; width:0.2 height:0.2; depth:0.2;" material="color:#666;" position="-0.8 0 0.3"></a-entity>
+                     <a-entity geometry="primitive:box; width:0.2 height:0.2; depth:0.2;" material="color:#666;" position="0.8 0 0.3"></a-entity>
+
+                    <a-entity geometry="primitive:cylinder; radius:0.6; height:0.2;"
+                              material="color:#888; metalness:0.8; roughness:0.2;"
+                              position="0 1 0"
+                              rotation="0 0 0"
+                              animation="property: rotation; to: 0 360 0; loop: true; dur:500; easing:linear">
+                        
+                        <!--Wheel center-->
+                        <a-entity geometry="primitive:cylinder; radius:0.2; height:0.25;"
+                                  material="color:#444; metalness:0.9;"
+                                  position="0 0 0">
+                        </a-entity>
+                        
+                        <!-- Spokes-->
+                        <a-entity geometry="primitive:box; width:1.2; height:0.02; depth:0.05;"
+                                  material="color:#555"
+                                  position="0 0 0"
+                                  rotation="0 0 0">
+                        </a-entity>
+
+                        <a-entity geometry="primitive:box; width:1.2; height:0.02; depth:0.05;"
+                                  material="color:#555"
+                                  position="0 0 0"
+                                  rotation="0 0 45">
+                        </a-entity>
+
+                        <a-entity geometry="primitive:box; width:1.2; height:0.02; depth:0.05;"
+                                  material="color:#555"
+                                  position="0 0 0"
+                                  rotation="0 0 90">
+                        </a-entity>
+
+                        <a-entity geometry="primitive:box; width:1.2; height:0.02; depth:0.05;"
+                                  material="color:#555"
+                                  position="0 0 0"
+                                  rotation="0 0 135">
+                        </a-entity>
+                    </a-entity>
+                 </a-entity>
+
+                 <!-- Giant Spout Above Counter -->
+                 <a-entity id="moltenSpout" position="-5 5 0">
+                    <!-- Spout Structure -->
+                    <a-entity geometry="primitive:cylinder; radius:0.5; height:6;" material="color:#444; metalness:0.9;" position="0 1 0"></a-entity>
+                    <a-entity geometry="primitive:cylinder; radius:0.8; height:1.5;" material="color:#555; metalness:0.9;" position="0 -1.5 0"></a-entity>
+                
+                    <!-- Glowing Molten Metal -->
+                    <a-entity geometry="primitive:cylinder; radius:0.3; height:0.5;" 
+                            material="color:#ff6600; emissive:#ff3300; emissiveIntensity:1.5;" 
+                            position="0 -2.05 0">
+                    </a-entity>
+                </a-entity>
+
+                <!-- Shaft with Button -->
+                <a-entity id="shaft" position="-5 0 1.5" rotation="0 90 0">
+                    <!-- Vertical Shaft -->
+                    <a-entity geometry="primitive:box; width:0.5; height:3; depth:0.5;" material="color:#666; metalness:0.8;" position="0 1.5 0"></a-entity>
+                
+                    <!-- Interactive Button -->
+                    <a-entity id="moltenButton"
+                            class="button interactive"
+                            activate-molten="fadeDuration= 5000"
+                            geometry="primitive:cylinder; radius:0.2; height:0.1;" 
+                            material="color:rgb(255,100,100); emissive:#ff0000; emissiveIntensity:1;"
+                            position="0 2 0.25"
+                            rotation="0 90 90"
+                            scale="1 1.5 1"
+                            animation__mouseenter="property:material.color; type:color; to:rgb(255,0,0); startEvents:mouseenter; dur:200;"
+                            animation__leave="property:material.color; type:color; to:rgb(255,100,100); startEvents:mouseleave; dur:200;"
+                            animation__click="property:scale.y; from:1; to:1.5; startEvents:click; dur:200;">
+                    </a-entity>
+                </a-entity>
+            </a-entity>
+                
+            <!-- Room of walls -->
+            <a-entity id="room">
+                <a-entity class="ground" 
+                          geometry="primitive:plane; width:16; height:16;" 
+                          material="color:#444; metalness:0.2; roughness:0.8;" 
+                          position="0 0.01 0" 
+                          rotation="-90 0 0" 
+                          shadow="cast:false; receive:true;">
+                </a-entity>
+                
+                <a-entity id="walls">
+                    <a-entity class="wall" 
+                              geometry="primitive:plane; width:20; height:10;" 
+                              material="color:#333; metalness:0.3; roughness:0.9;" 
+                              position="8 4 0"  
+                              rotation="0 -90 0" 
+                              shadow="cast:false; receive:true;">
+                    </a-entity>
+                    <a-entity class="wall" 
+                              geometry="primitive:plane; width:20; height:10;" 
+                              material="color:#333; metalness:0.3; roughness:0.9;" 
+                              position="-8 4 0"  
+                              rotation="0 90 0" 
+                              shadow="cast:false; receive:true;">
+                    </a-entity>
+                    <!--Back-->
+                    <a-entity class="wall" 
+                              geometry="primitive:plane; width:20; height:10;" 
+                              material="color:#333; metalness:0.3; roughness:0.9;" 
+                              position="0 4 5.5"  
+                              rotation="0 180 0" 
+                              shadow="cast:false; receive:true;">
+                    </a-entity>
+                    <!--Front-->
+                    <a-entity class="wall" 
+                              geometry="primitive:plane; width:20; height:10;" 
+                              material="color:#333; metalness:0.3; roughness:0.9;" 
+                              position="0 4 -8"  
+                              rotation="0 0 0" 
+                              shadow="cast:false; receive:true;">
+                    </a-entity>
+                </a-entity>
+
+                <a-entity id="roof"
+                          geometry="primitive:plane; width:16; height:16;"
+                          material="color:#555; metalness:0.6; roughness:0.4;"
+                          position="0 8.5 0"
+                          rotation="90 0 0"
+                          shadow="cast:false; receive:true">
+                </a-entity>
+            </a-entity>
+
+            <a-entity id="overhead_lights">
+                <!--Center Light-->
+                <a-entity light="type:point; intensity:1.2; distance:5.0; color:#ffffff"
+                          position="0 3.5 0"
+                          shadow="cast:true">
+                </a-entity>
+            </a-entity>
+
+            <!-- add a basic environment to help ground users visually -->
+            <a-entity environment="preset:threetowers;"></a-entity>
+
+            <!-- Spawnning Test-->
+            <!-- <a-entity id="sword" gltf-model="#first_sword_model" position="0 0 0" rotation="-90 0 0" scale="0.008 0.008 0.008"></a-entity> -->
+            <!-- <a-entity id="ingot" class="ingot" gltf-model="#iron" position="0 1.5 0" rotation="0 90 0" scale="6 6 6" pickupable dynamic-body></a-entity>
+            <a-entity id="ingot" class="ingot" gltf-model="#iron" position="0 2 0" rotation="0 90 0" scale="6 6 6" pickupable dynamic-body></a-entity>
+            -->
+        </a-scene>
+    </body>
+</html>
