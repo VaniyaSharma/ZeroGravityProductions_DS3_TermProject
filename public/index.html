@@ -1,56 +1,46 @@
 <html>
     <head>
-        <title>Akhil - Test World</title>
+        <title>Akhil - Test Physics World</title>
         <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 
         <!-- Environment add-on-->
         <script src="https://unpkg.com/aframe-environment-component@1.3.3/dist/aframe-environment-component.min.js"></script>
 
+        <!-- Physics add-on-->
+        <script src="https://cdn.jsdelivr.net/gh/n5ro/aframe-physics-system@v$npm_package_version/dist/aframe-physics-system.min.js"></script>
+
         <!-- Javascript stuff-->
-         <script src="js/boundary-check.js"></script>
+         <script src="js/player-move.js"></script>
     </head>
     <body>
-        <a-scene test-experience>
-            <!-- Camera -->
-            <a-entity id="mainCam" 
-                      camera 
-                      wasd-controls="acceleration: 20" 
-                      look-controls 
-                      position="0 1.6 0"
-                      boundary-check="minX: -10; maxX: 10; minZ: -10; maxZ: 10">
-                <!-- For cursor interaction -->
-                <a-entity cursor="rayOrigin:mouse;" 
-                          raycaster="far:5; interval:200; objects:.interactive">
+        <a-scene physics="debug: true" tabindex="0">
+            <!-- Player entity -->
+            <a-entity id="player" 
+                      geometry="primitive: sphere; radius: 0.5" 
+                      material="color: blue" 
+                      position="0 1 0"
+                      dynamic-body="mass: 1"
+                      player-move>
+                <!-- camera attached to the player-->
+                <a-entity camera
+                          position="0 1.5 0"
+                          look-control>
                 </a-entity>
              </a-entity>
 
-             <!-- Ground Plane-->
-              <!-- <a-entity geometry="primitive: plane; width: 50; height: 50"
+             <!-- Ground Plane -->
+              <a-entity geometry="primitive: plane; width: 50; height: 50"
                         material="color: #7BC8A4"
-                        rotation="-90 0 0">
+                        rotation="-90 0 0"
+                        static-body>
               </a-entity>
-              -->
 
-              <!-- Visual boundary markers-->
-              <a-entity geometry="primitive: box; width: 0.1; height: 1; depth: 20"
-                        material="color: #FF0000"
-                        position="-10 1 0"
-                        rotation="0 0 0">
-              </a-entity>
-              <a-entity geometry="primitive: box; width: 0.1; height: 1; depth: 20"
-                        material="color: #FF0000"
-                        position="10 1 0"
-                        rotation="0 0 0">
-              </a-entity>
-              <a-entity geometry="primitive: box; width: 0.1; height: 1; depth: 20"
-                        material="color: #FF0000"
-                        position="0 1 -10"
-                        rotation="0 90 0">
-              </a-entity>
-              <a-entity geometry="primitive: box; width: 0.1; height: 1; depth: 20"
-                        material="color: #FF0000"
-                        position="0 1 10"
-                        rotation="0 90 0">
+              <!-- Wall -->
+              <a-entity id="wall"
+                        geometry="primitive: box; width: 5; height: 2; depth: 0.5"
+                        material="color: red"
+                        position="0 1 -5"
+                        static-body>
               </a-entity>
             <!-- add a basic environment to help ground users visually -->
             <a-entity environment="preset:contact;"></a-entity>
